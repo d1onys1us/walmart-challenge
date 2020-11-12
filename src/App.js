@@ -1,25 +1,132 @@
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
 import './App.css';
+import ReactPaginate from 'react-paginate'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <Router>
+      <Switch>
+        <Route path="/view_issue/:id" exact component={ViewIssue} />
+        <Route path="/">
+          <Home />
+        </Route>
+      </Switch>
+    </Router>
+  )
+}
+
+// Home component
+function Home() {
+  // Constants
+  const organization = "walmartlabs"
+  const repo = "thorax"
+  const [currentPage, setCurrentPage] = useState(0);
+  const [issues, setIssues] = useState([]);
+  const [error, setError] = useState(null);
+  const PER_PAGE = 10;
+  const offset = currentPage * PER_PAGE;
+  // Slice and set current page data from fetch issues
+  const currentPageData = issues
+    .slice(offset, offset + PER_PAGE)
+    .map((issue) =>
+      <Issue key={issue.id} issue={issue} title={issue.title} url={issue.html_url} number={issue.number} state={issue.state} />
+    );
+  const pageCount = Math.ceil(issues.length / PER_PAGE);
+
+  useEffect(() => {
+    fetchIssues();
+  }, []);
+
+  function fetchIssues() {
+    fetch("https://api.github.com/repos/" + organization + "/" + repo + "/issues")
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setIssues(result);
+        },
+        (error) => {
+          setError(error);
+        }
+      )
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  } else {
+    return (
+      <>
+        <div className="container mt-3">
+          <center>
+            <button type="button" className="btn btn-success" onClick={fetchIssues}>Refresh Issues</button>
+          </center>
+          {currentPageData}
+        </div>
+        <footer className='footer mt-auto py-3'>
+          <div className="container text-center">
+            <ReactPaginate
+              containerClassName="pagination"
+              breakClassName="page-item"
+              breakLabel={<div className="page-link">...</div>}
+              pageClassName="page-item"
+              previousClassName="page-item"
+              nextClassName="page-item"
+              pageLinkClassName="page-link"
+              previousLinkClassName="page-link"
+              nextLinkClassName="page-link"
+              activeClassName="active"
+              pageCount={pageCount}
+              onPageChange={handlePageClick}
+            />
+          </div>
+        </footer>
+      </>
+    );
+  }
+
+  function handlePageClick({ selected: selectedPage }) {
+    setCurrentPage(selectedPage);
+  }
+}
+
+// Issue component
+function Issue(props) {
+  return (
+    <div className="my-3 mx-auto card text-center" style={{ width: "18rem" }}>
+      <div className="card-body">
+        <h5 className="card-title">{props.title}</h5>
+        <h6 className="card-subtitle mb-2 text-muted">Issue #{props.number}</h6>
+        <p>State: <b>{props.state}</b></p>
+        <Link to={{
+          pathname: "/view_issue/" + props.issue.id,
+          state: { issue: props.issue }
+        }}>View Issue</Link>
+      </div>
     </div>
   );
+}
+
+// View issue component
+function ViewIssue(props) {
+  const { issue } = props.location.state;
+  return (
+    <div className="mt-3 container">
+      <Link to="/">⭠ Back to issues</Link>
+      <h1>{issue.title}</h1>
+      <h3 className="text-muted">Issue #{issue.number}</h3>
+      <p>State: <b>{issue.state}</b></p>
+      <p>Created at: {issue.created_at}</p>
+      <p>URL: {issue.url}</p>
+      <p>Description: </p>
+      <hr />
+      <p>{issue.body}</p>
+    </div>
+  )
 }
 
 export default App;
