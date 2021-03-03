@@ -136,49 +136,63 @@ function Issue(props) {
 
 // View issue component
 function ViewIssue(props) {
-  let issues = null;
-  let issue = null;
+  const [issue, setIssue] = useState(null);
 
-  function fetchIssues() {
+  // useEffect(() => {
+  //   fetchIssues();
+  // }, []);
+
+  useEffect(() => {
     fetch(
-      "https://api.github.com/repos/" + "walmartlabs" + "/" + "thorax" + "/issues"
+      "https://api.github.com/repos/walmartlabs/thorax/issues"
     )
       .then((res) => res.json())
-      .then(
-        (result) => {
-          issues = result;
+      .then((result) => {
+          let issues = result;
+
+          //if (props.location.state == undefined) {
+            let pathname = props.location.pathname;
+            let lastBackslashIndex = pathname.lastIndexOf("/");
+            let issueId = pathname.substring(lastBackslashIndex+1, pathname.length+1);
+
+            console.log("issueId: " + issueId);
+            setIssue(issues.find(i => i.id === parseInt(issueId)));
+            console.log(issues)
+            console.log("what is it:")
+            console.log(issue)
+            //setIssue(issue);
+            
+          // } else {
+          //   console.log("state: ", props.location.state);
+          // }
         },
         (error) => {
           console.log("oh no!")
         }
       );
+  });
+
+  //fetchIssues();
+
+  if (issue !== null) {
+    return (
+      <div className="mt-3 container">
+        <Link to="/">⭠ Back to issues</Link>
+        <h1>{issue.title}</h1>
+        <h3 className="text-muted">Issue #{issue.number}</h3>
+        <p>
+          State: <b>{issue.state}</b>
+        </p>
+        <p>Created at: {issue.created_at}</p>
+        <p>URL: {issue.url}</p>
+        <p>Description: </p>
+        <hr />
+        <p>{issue.body}</p>
+      </div>
+    );
+  } else {
+    return <p>LOADING...</p>
   }
-
-  if (props.location.state == undefined) {
-    fetchIssues();
-    return (<p>yay it got fetched</p>)
-
-
-    // do search
-    //issues.f
-  }
-
-  issue = props.location.state.issue;
-  return (
-    <div className="mt-3 container">
-      <Link to="/">⭠ Back to issues</Link>
-      <h1>{issue.title}</h1>
-      <h3 className="text-muted">Issue #{issue.number}</h3>
-      <p>
-        State: <b>{issue.state}</b>
-      </p>
-      <p>Created at: {issue.created_at}</p>
-      <p>URL: {issue.url}</p>
-      <p>Description: </p>
-      <hr />
-      <p>{issue.body}</p>
-    </div>
-  );
 }
 
 export default App;
