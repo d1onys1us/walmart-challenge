@@ -136,7 +136,34 @@ function Issue(props) {
 
 // View issue component
 function ViewIssue(props) {
-  const { issue } = props.location.state;
+  let issues = null;
+  let issue = null;
+
+  function fetchIssues() {
+    fetch(
+      "https://api.github.com/repos/" + "walmartlabs" + "/" + "thorax" + "/issues"
+    )
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          issues = result;
+        },
+        (error) => {
+          console.log("oh no!")
+        }
+      );
+  }
+
+  if (props.location.state == undefined) {
+    fetchIssues();
+    return (<p>yay it got fetched</p>)
+
+
+    // do search
+    //issues.f
+  }
+
+  issue = props.location.state.issue;
   return (
     <div className="mt-3 container">
       <Link to="/">⭠ Back to issues</Link>
