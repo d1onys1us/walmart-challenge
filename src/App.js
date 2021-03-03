@@ -7,6 +7,11 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import Button from '@material-ui/core/Button';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+
+
 
 function App() {
   return (
@@ -29,14 +34,14 @@ function Home() {
   const [currentPage, setCurrentPage] = useState(0);
   const [issues, setIssues] = useState([]);
   const [error, setError] = useState(null);
-  const PER_PAGE = 10;
+  const PER_PAGE = 9;
   const offset = currentPage * PER_PAGE;
   // Slice and set current page data from fetch issues
   const currentPageData = issues
-    .slice(offset, offset + PER_PAGE)
-    .map((issue) =>
-      <Issue key={issue.id} issue={issue} title={issue.title} url={issue.html_url} number={issue.number} state={issue.state} />
-    );
+    .slice(offset, offset + PER_PAGE);
+    // .map((issue) =>
+    //   <Issue key={issue.id} issue={issue} title={issue.title} url={issue.html_url} number={issue.number} state={issue.state} />
+    // );
   const pageCount = Math.ceil(issues.length / PER_PAGE);
 
   useEffect(() => {
@@ -56,6 +61,20 @@ function Home() {
       )
   }
 
+  function makeGrid(listOfIssues) {
+    //const classes = useStyles();
+
+    return (
+    <GridList cellHeight={300} cols={3}>
+  {listOfIssues.map((issue) => (
+    <GridListTile key={issue.id} cols={1}>
+      <Issue key={issue.id} issue={issue} title={issue.title} url={issue.html_url} number={issue.number} state={issue.state} />
+
+    </GridListTile>
+  ))}
+</GridList>);
+  }
+
   if (error) {
     return <div>Error: {error.message}</div>;
   } else {
@@ -63,9 +82,9 @@ function Home() {
       <>
         <div className="container mt-3">
           <center>
-            <button type="button" className="btn btn-success" onClick={fetchIssues}>Refresh Issues</button>
+            <Button variant="contained" color="primary" onClick={fetchIssues}>Refresh Issues</Button>
           </center>
-          {currentPageData}
+          {makeGrid(currentPageData)}
         </div>
         <footer className='footer mt-auto py-3'>
           <div className="container text-center">
