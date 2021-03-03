@@ -114,7 +114,10 @@ function Home() {
 // Issue component
 function Issue(props) {
   return (
-    <div className="my-3 mx-auto card text-center" style={{ width: "18rem", height: "12rem"}}>
+    <div
+      className="my-3 mx-auto card text-center"
+      style={{ width: "18rem", height: "12rem" }}
+    >
       <div className="card-body">
         <h5 className="card-title">{props.title}</h5>
         <h6 className="card-subtitle mb-2 text-muted">Issue #{props.number}</h6>
@@ -138,41 +141,25 @@ function Issue(props) {
 function ViewIssue(props) {
   const [issue, setIssue] = useState(null);
 
-  // useEffect(() => {
-  //   fetchIssues();
-  // }, []);
-
   useEffect(() => {
-    fetch(
-      "https://api.github.com/repos/walmartlabs/thorax/issues"
-    )
+    fetch("https://api.github.com/repos/walmartlabs/thorax/issues")
       .then((res) => res.json())
-      .then((result) => {
+      .then(
+        (result) => {
           let issues = result;
-
-          //if (props.location.state == undefined) {
-            let pathname = props.location.pathname;
-            let lastBackslashIndex = pathname.lastIndexOf("/");
-            let issueId = pathname.substring(lastBackslashIndex+1, pathname.length+1);
-
-            console.log("issueId: " + issueId);
-            setIssue(issues.find(i => i.id === parseInt(issueId)));
-            console.log(issues)
-            console.log("what is it:")
-            console.log(issue)
-            //setIssue(issue);
-            
-          // } else {
-          //   console.log("state: ", props.location.state);
-          // }
+          let pathname = props.location.pathname;
+          let lastBackslashIndex = pathname.lastIndexOf("/");
+          let issueId = pathname.substring(
+            lastBackslashIndex + 1,
+            pathname.length + 1
+          );
+          setIssue(issues.find((i) => i.id === parseInt(issueId)));
         },
         (error) => {
-          console.log("oh no!")
+          console.log("oh no!");
         }
       );
   });
-
-  //fetchIssues();
 
   if (issue !== null) {
     return (
@@ -191,7 +178,7 @@ function ViewIssue(props) {
       </div>
     );
   } else {
-    return <p>LOADING...</p>
+    return <p>LOADING...</p>;
   }
 }
 
