@@ -146,20 +146,20 @@ function ViewIssue(props) {
       .then((res) => res.json())
       .then(
         (result) => {
-          let issues = result;
           let pathname = props.location.pathname;
           let lastBackslashIndex = pathname.lastIndexOf("/");
           let issueId = pathname.substring(
             lastBackslashIndex + 1,
             pathname.length + 1
           );
-          setIssue(issues.find((i) => i.id === parseInt(issueId)));
+          setIssue(result.find((i) => i.id === parseInt(issueId)));
         },
         (error) => {
           console.log("oh no!");
         }
       );
-  });
+      // dependency array
+  }, [props.location.pathname]);
 
   if (issue !== null) {
     return (
