@@ -1,17 +1,10 @@
-import { useState, useEffect } from 'react';
-import './App.css';
-import ReactPaginate from 'react-paginate'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
-import Button from '@material-ui/core/Button';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-
-
+import { useState, useEffect } from "react";
+import "./App.css";
+import ReactPaginate from "react-paginate";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import Button from "@material-ui/core/Button";
+import GridList from "@material-ui/core/GridList";
+import GridListTile from "@material-ui/core/GridListTile";
 
 function App() {
   return (
@@ -23,25 +16,21 @@ function App() {
         </Route>
       </Switch>
     </Router>
-  )
+  );
 }
 
 // Home component
 function Home() {
   // Constants
-  const organization = "walmartlabs"
-  const repo = "thorax"
+  const organization = "walmartlabs";
+  const repo = "thorax";
   const [currentPage, setCurrentPage] = useState(0);
   const [issues, setIssues] = useState([]);
   const [error, setError] = useState(null);
   const PER_PAGE = 9;
   const offset = currentPage * PER_PAGE;
   // Slice and set current page data from fetch issues
-  const currentPageData = issues
-    .slice(offset, offset + PER_PAGE);
-    // .map((issue) =>
-    //   <Issue key={issue.id} issue={issue} title={issue.title} url={issue.html_url} number={issue.number} state={issue.state} />
-    // );
+  const currentPageData = issues.slice(offset, offset + PER_PAGE);
   const pageCount = Math.ceil(issues.length / PER_PAGE);
 
   useEffect(() => {
@@ -49,8 +38,10 @@ function Home() {
   }, []);
 
   function fetchIssues() {
-    fetch("https://api.github.com/repos/" + organization + "/" + repo + "/issues")
-      .then(res => res.json())
+    fetch(
+      "https://api.github.com/repos/" + organization + "/" + repo + "/issues"
+    )
+      .then((res) => res.json())
       .then(
         (result) => {
           setIssues(result);
@@ -58,21 +49,26 @@ function Home() {
         (error) => {
           setError(error);
         }
-      )
+      );
   }
 
   function makeGrid(listOfIssues) {
-    //const classes = useStyles();
-
     return (
-    <GridList cellHeight={300} cols={3}>
-  {listOfIssues.map((issue) => (
-    <GridListTile key={issue.id} cols={1}>
-      <Issue key={issue.id} issue={issue} title={issue.title} url={issue.html_url} number={issue.number} state={issue.state} />
-
-    </GridListTile>
-  ))}
-</GridList>);
+      <GridList cellHeight={300} cols={3}>
+        {listOfIssues.map((issue) => (
+          <GridListTile key={issue.id} cols={1}>
+            <Issue
+              key={issue.id}
+              issue={issue}
+              title={issue.title}
+              url={issue.html_url}
+              number={issue.number}
+              state={issue.state}
+            />
+          </GridListTile>
+        ))}
+      </GridList>
+    );
   }
 
   if (error) {
@@ -82,11 +78,13 @@ function Home() {
       <>
         <div className="container mt-3">
           <center>
-            <Button variant="contained" color="primary" onClick={fetchIssues}>Refresh Issues</Button>
+            <Button variant="contained" color="primary" onClick={fetchIssues}>
+              Refresh Issues
+            </Button>
           </center>
           {makeGrid(currentPageData)}
         </div>
-        <footer className='footer mt-auto py-3'>
+        <footer className="footer mt-auto py-3">
           <div className="container text-center">
             <ReactPaginate
               containerClassName="pagination"
@@ -116,15 +114,21 @@ function Home() {
 // Issue component
 function Issue(props) {
   return (
-    <div className="my-3 mx-auto card text-center" style={{ width: "18rem" }}>
+    <div className="my-3 mx-auto card text-center" style={{ width: "18rem", height: "12rem"}}>
       <div className="card-body">
         <h5 className="card-title">{props.title}</h5>
         <h6 className="card-subtitle mb-2 text-muted">Issue #{props.number}</h6>
-        <p>State: <b>{props.state}</b></p>
-        <Link to={{
-          pathname: "/view_issue/" + props.issue.id,
-          state: { issue: props.issue }
-        }}>View Issue</Link>
+        <p>
+          State: <b>{props.state}</b>
+        </p>
+        <Link
+          to={{
+            pathname: "/view_issue/" + props.issue.id,
+            state: { issue: props.issue },
+          }}
+        >
+          View Issue
+        </Link>
       </div>
     </div>
   );
@@ -138,14 +142,16 @@ function ViewIssue(props) {
       <Link to="/">⭠ Back to issues</Link>
       <h1>{issue.title}</h1>
       <h3 className="text-muted">Issue #{issue.number}</h3>
-      <p>State: <b>{issue.state}</b></p>
+      <p>
+        State: <b>{issue.state}</b>
+      </p>
       <p>Created at: {issue.created_at}</p>
       <p>URL: {issue.url}</p>
       <p>Description: </p>
       <hr />
       <p>{issue.body}</p>
     </div>
-  )
+  );
 }
 
 export default App;
